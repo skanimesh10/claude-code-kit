@@ -4,17 +4,19 @@
  */
 
 import { join } from "path";
+import ora from "ora";
 import { readConfig, SKILLS_DIR } from "../lib/config.js";
 import { downloadSkills } from "../lib/github.js";
 import { readLockfile, writeLockfile } from "../lib/lockfile.js";
 import { computeHash } from "../lib/skills.js";
+import { bold, cyan, green, yellow, icons } from "../lib/colors.js";
 
 export async function update() {
   const config = readConfig();
 
   const oldLock = readLockfile();
   if (Object.keys(oldLock.skills).length === 0) {
-    console.log("No skills installed yet. Run `cc-kit init` first.");
+    console.log(`${icons.warn} ${yellow("No skills installed yet.")} Run ${cyan("cc-kit init")} first.`);
     return;
   }
 
@@ -23,13 +25,12 @@ export async function update() {
   let updated = 0;
 
   for (const source of config.sources) {
-    console.log(
-      "Updating %d skill(s) from %s...",
-      source.skills.length,
-      source.repo
-    );
+    const spinner = ora(
+      `Updating ${source.skills.length} skill(s) from ${source.repo}...`
+    ).start();
     const extracted = await downloadSkills(source.repo, source.skills);
 
+    const changes = [];
     for (const name of extracted) {
       const hash = computeHash(join(SKILLS_DIR, name));
       newLock.skills[name] = {
@@ -41,12 +42,20 @@ export async function update() {
       // Compare against previous lockfile to detect new vs updated skills
       const old = oldLock.skills[name];
       if (!old) {
-        console.log(`  + ${name} (new)`);
+        changes.push(`  ${icons.plus} ${name} ${green("(new)")}`);
         added++;
       } else if (old.computedHash !== hash) {
-        console.log(`  ~ ${name} (updated)`);
+        changes.push(`  ${yellow("~")} ${name} ${yellow("(updated)")}`);
         updated++;
       }
+    }
+
+    spinner.succeed(
+      `Updated ${extracted.length} skill(s) from ${source.repo}`
+    );
+
+    for (const line of changes) {
+      console.log(line);
     }
   }
 
@@ -54,8 +63,8 @@ export async function update() {
 
   const total = Object.keys(newLock.skills).length;
   if (added === 0 && updated === 0) {
-    console.log("Already up to date.");
+    console.log(`${icons.check} Already up to date.`);
   } else {
-    console.log(`\n${added} new, ${updated} updated, ${total} total skills.`);
+    console.log(`\n${bold(`${green(added)} new, ${yellow(updated)} updated, ${total} total skills.`)}`);
   }
 }

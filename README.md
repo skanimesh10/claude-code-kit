@@ -61,6 +61,12 @@ Compares the lockfile against on-disk skills and reports per-skill status:
 | `UNTRACKED` | On disk but not tracked in the lockfile       |
 | `MODIFIED`  | On disk but contents differ from the lockfile |
 
+## Included skills
+
+| Skill | Source | Description |
+|-------|--------|-------------|
+| `mcp-builder` | [anthropics/skills](https://github.com/anthropics/skills) | Guide for creating MCP (Model Context Protocol) servers that enable LLMs to interact with external services |
+
 ## How it works
 
 1. `cc-kit` ships with a bundled `skills.json` registry that lists GitHub repos and which skill directories to extract from each.
@@ -79,6 +85,7 @@ claude-code-kit/
 │   │   ├── update.js          — Re-download and detect changes
 │   │   └── status.js          — Show install state of each skill
 │   └── lib/
+│       ├── colors.js          — ANSI color helpers and Unicode icons
 │       ├── config.js          — Read bundled skills.json registry
 │       ├── github.js          — Download & extract repo tarballs
 │       ├── lockfile.js        — Read/write skills-lock.json

@@ -9,11 +9,15 @@
 
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
+import ora from "ora";
 import { SKILLS_DIR } from "../lib/config.js";
 import { readLockfile } from "../lib/lockfile.js";
 import { computeHash } from "../lib/skills.js";
+import { bold, dim, cyan, green, red, yellow, icons } from "../lib/colors.js";
 
 export function status() {
+  const spinner = ora("Checking skills status...").start();
+
   const lock = readLockfile();
   const lockedNames = new Set(Object.keys(lock.skills));
 
@@ -29,30 +33,36 @@ export function status() {
   const allNames = [...new Set([...lockedNames, ...diskSet])].sort();
 
   if (allNames.length === 0) {
-    console.log("No skills installed. Run `cc-kit init` to get started.");
+    spinner.stop();
+    console.log(`${icons.warn} ${yellow("No skills installed.")} Run ${cyan("cc-kit init")} to get started.`);
     return;
   }
 
-  console.log("Skills status:\n");
+  const rows = [];
   for (const name of allNames) {
     const inLock = lockedNames.has(name);
     const onDisk = diskSet.has(name);
 
     if (inLock && !onDisk) {
-      // Recorded in lockfile but directory was deleted
-      console.log(`  ${name}  MISSING`);
+      rows.push(`  ${name}  ${red("MISSING")}`);
     } else if (!inLock && onDisk) {
-      // Directory exists but wasn't installed by cc-kit
-      console.log(`  ${name}  UNTRACKED`);
+      rows.push(`  ${name}  ${yellow("UNTRACKED")}`);
     } else {
       const hash = computeHash(join(SKILLS_DIR, name));
       if (hash !== lock.skills[name].computedHash) {
-        console.log(`  ${name}  MODIFIED`);
+        rows.push(`  ${name}  ${yellow("MODIFIED")}`);
       } else {
-        console.log(`  ${name}  OK`);
+        rows.push(`  ${name}  ${green("OK")}`);
       }
     }
   }
 
-  console.log(`\n${allNames.length} skills total.`);
+  spinner.stop();
+
+  console.log(bold("Skills status:\n"));
+  for (const row of rows) {
+    console.log(row);
+  }
+
+  console.log(dim(`\n${allNames.length} skills total.`));
 }
