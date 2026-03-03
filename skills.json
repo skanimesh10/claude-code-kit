@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "repo": "anthropics/skills",
+      "skills": ["mcp-builder"]
+    }
+  ]
+}

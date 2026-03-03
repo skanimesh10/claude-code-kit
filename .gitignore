@@ -1,0 +1,5 @@
+node_modules/
+.claude/
+skills-lock.json
+*.tgz
+.DS_Store
