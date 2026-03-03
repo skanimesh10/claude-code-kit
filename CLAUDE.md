@@ -32,7 +32,7 @@ skills.json            — Bundled registry of skill sources (ships with package
 node bin/cc-kit.js init          # Download and install skills (first time)
 node bin/cc-kit.js init --force  # Re-download even if already installed
 node bin/cc-kit.js update        # Re-download and report new/changed skills
-node bin/cc-kit.js status        # Show per-skill status (ok, MISSING, MODIFIED, UNTRACKED)
+node bin/cc-kit.js status        # Show per-skill status (OK, MISSING, MODIFIED, UNTRACKED)
 ```
 
 ## Dependencies

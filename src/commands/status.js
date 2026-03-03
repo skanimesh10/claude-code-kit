@@ -1,7 +1,7 @@
 /**
  * `cc-kit status` command — compares the lockfile against on-disk skills
  * and reports one of four states per skill:
- *   ok        — locked and on disk with matching hash
+ *   OK        — locked and on disk with matching hash
  *   MISSING   — in lockfile but not on disk
  *   UNTRACKED — on disk but not in lockfile
  *   MODIFIED  — on disk but hash differs from lockfile
@@ -49,7 +49,7 @@ export function status() {
       if (hash !== lock.skills[name].computedHash) {
         console.log(`  ${name}  MODIFIED`);
       } else {
-        console.log(`  ${name}  ok`);
+        console.log(`  ${name}  OK`);
       }
     }
   }

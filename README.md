@@ -56,7 +56,7 @@ Compares the lockfile against on-disk skills and reports per-skill status:
 
 | Status      | Meaning                                      |
 |-------------|----------------------------------------------|
-| `ok`        | Installed and matches the lockfile hash       |
+| `OK`        | Installed and matches the lockfile hash       |
 | `MISSING`   | In the lockfile but not found on disk         |
 | `UNTRACKED` | On disk but not tracked in the lockfile       |
 | `MODIFIED`  | On disk but contents differ from the lockfile |
@@ -70,17 +70,23 @@ Compares the lockfile against on-disk skills and reports per-skill status:
 ## Project structure
 
 ```
-bin/cc-kit.js          — CLI entry point
-src/commands/
-  init.js              — First-time skill installation
-  update.js            — Re-download and detect changes
-  status.js            — Show install state of each skill
-src/lib/
-  config.js            — Read bundled skills.json registry
-  github.js            — Download & extract repo tarballs
-  lockfile.js          — Read/write skills-lock.json
-  skills.js            — Hash skill directories for change detection
-skills.json            — Bundled skill source registry
+claude-code-kit/
+├── bin/
+│   └── cc-kit.js              — CLI entry point
+├── src/
+│   ├── commands/
+│   │   ├── init.js            — First-time skill installation
+│   │   ├── update.js          — Re-download and detect changes
+│   │   └── status.js          — Show install state of each skill
+│   └── lib/
+│       ├── config.js          — Read bundled skills.json registry
+│       ├── github.js          — Download & extract repo tarballs
+│       ├── lockfile.js        — Read/write skills-lock.json
+│       └── skills.js          — Hash skill directories for change detection
+├── skills.json                — Bundled skill source registry
+├── package.json
+├── CLAUDE.md
+└── README.md
 ```
 
 ## Author
