@@ -9,13 +9,13 @@ A CLI tool to install and manage [Claude Code](https://claude.ai/code) skills fr
 ## Installation
 
 ```bash
-npm install -g claude-code-kit
+npm install -g @skanimesh10/claude-code-kit
 ```
 
 Or run directly with `npx`:
 
 ```bash
-npx claude-code-kit init
+npx @skanimesh10/claude-code-kit init
 ```
 
 ## Requirements
