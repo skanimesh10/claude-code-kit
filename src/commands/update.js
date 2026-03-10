@@ -1,6 +1,6 @@
 /**
- * `cc-kit update` command — re-downloads all skills from configured sources
- * and reports which skills are new or have changed since the last install/update.
+ * `cc-kit update` command — re-downloads all skills from configured sources,
+ * re-transforms and re-symlinks for saved targets, and reports changes.
  */
 
 import { join } from "path";
@@ -9,9 +9,10 @@ import { readConfig, SKILLS_DIR } from "../lib/config.js";
 import { downloadSkills } from "../lib/github.js";
 import { readLockfile, writeLockfile } from "../lib/lockfile.js";
 import { computeHash } from "../lib/skills.js";
+import { TARGETS, processTarget } from "../lib/targets.js";
 import { bold, cyan, green, yellow, icons } from "../lib/colors.js";
 
-export async function update() {
+export async function update(options) {
   const config = readConfig();
 
   const oldLock = readLockfile();
@@ -20,7 +21,8 @@ export async function update() {
     return;
   }
 
-  const newLock = { version: 1, skills: {} };
+  const targetKeys = oldLock.targets || ["claude"];
+  const newLock = { version: 1, targets: targetKeys, skills: {} };
   let added = 0;
   let updated = 0;
 
@@ -39,7 +41,6 @@ export async function update() {
         computedHash: hash,
       };
 
-      // Compare against previous lockfile to detect new vs updated skills
       const old = oldLock.skills[name];
       if (!old) {
         changes.push(`  ${icons.plus} ${name} ${green("(new)")}`);
@@ -57,6 +58,14 @@ export async function update() {
     for (const line of changes) {
       console.log(line);
     }
+  }
+
+  // Re-transform and re-symlink for all saved targets
+  const skillNames = Object.keys(newLock.skills);
+  for (const targetKey of targetKeys) {
+    const spinner = ora(`Updating ${TARGETS[targetKey].name}...`).start();
+    processTarget(skillNames, targetKey);
+    spinner.succeed(`${TARGETS[targetKey].name} ${icons.arrow} ${TARGETS[targetKey].ideDir}`);
   }
 
   writeLockfile(newLock);
