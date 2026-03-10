@@ -128,14 +128,26 @@ ${content}
     }
     cpSync(sourceDir, skillOutDir, { recursive: true });
 
-    // Generate SKILL.md with frontmatter
-    const { description } = concatenateMarkdownFiles(sourceDir);
+    // If source already has a SKILL.md with frontmatter, keep it as-is
+    const existingSkillMd = join(skillOutDir, "SKILL.md");
+    if (existsSync(existingSkillMd)) {
+      const existing = readFileSync(existingSkillMd, "utf8");
+      if (existing.trim().startsWith("---")) {
+        return; // already has proper frontmatter
+      }
+    }
+
+    // Generate SKILL.md with frontmatter + full skill content
+    const { content, description } = concatenateMarkdownFiles(sourceDir);
     const skillMd = `---
 name: "${skillName}"
 description: "${description}"
+allowed-tools: Read, Write, Edit, Glob, Grep
 ---
+
+${content}
 `;
-    writeFileSync(join(skillOutDir, "SKILL.md"), skillMd);
+    writeFileSync(existingSkillMd, skillMd);
   }
 }
 
