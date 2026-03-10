@@ -7,7 +7,8 @@ import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-export const SKILLS_DIR = join(".claude", "skills");
+export const LOCALAGENT_DIR = ".localagent";
+export const SKILLS_DIR = join(LOCALAGENT_DIR, "skills");
 export const LOCKFILE = "skills-lock.json";
 
 // Resolve __dirname from import.meta.url so we can locate skills.json relative

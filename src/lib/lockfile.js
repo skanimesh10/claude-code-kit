@@ -10,7 +10,7 @@ export function readLockfile() {
   try {
     return JSON.parse(readFileSync(LOCKFILE, "utf8"));
   } catch {
-    return { version: 1, skills: {} };
+    return { version: 1, targets: [], skills: {} };
   }
 }
 
