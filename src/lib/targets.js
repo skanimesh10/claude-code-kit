@@ -70,10 +70,21 @@ export function concatenateMarkdownFiles(dir) {
     const content = readFileSync(join(dir, file), "utf8").trim();
     parts.push(`<!-- file: ${file} -->\n${content}`);
 
-    // Use first non-empty line of first file as description
+    // Use first non-empty, non-heading, non-frontmatter line as description
     if (!description) {
-      const firstLine = content.split("\n").find((l) => l.trim() && !l.startsWith("#"));
-      if (firstLine) description = firstLine.trim().slice(0, 120);
+      const lines = content.split("\n");
+      let inFrontmatter = false;
+      for (const l of lines) {
+        const trimmed = l.trim();
+        if (trimmed === "---") {
+          inFrontmatter = !inFrontmatter;
+          continue;
+        }
+        if (inFrontmatter) continue;
+        if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("<!--")) continue;
+        description = trimmed.slice(0, 120);
+        break;
+      }
     }
   }
 
