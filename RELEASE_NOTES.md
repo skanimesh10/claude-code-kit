@@ -9,6 +9,7 @@
 - **New skills added**
   - `frontend-design` from `anthropics/skills`
   - `react-best-practices` from `vercel-labs/agent-skills`
+- **CI/CD pipeline** — Added GitHub Actions workflow to automatically publish to npm on push to `main`.
 
 ### Improvements
 
@@ -20,6 +21,7 @@
 
 - Added `src/lib/colors.js` — shared ANSI color helpers and Unicode icons.
 - Added `src/lib/targets.js` — target registry with transform and symlink logic.
+- Added `.github/workflows/publish.yml` — automated npm publish on push to `main`.
 - Refactored `init`, `update`, and `status` commands to support multiple targets.
 - Lockfile now persists selected `targets` array for use across commands.
 

@@ -58,6 +58,14 @@ node /path/to/claude-code-kit/bin/cc-kit.js update
 | `vscode` | VS Code / Copilot | `.instructions.md` with frontmatter | `.github/instructions/` | file |
 | `antigravity` | Google Antigravity | Copy + `SKILL.md` | `.agent/skills/` | dir |
 
+### Key Lib Files
+
+- **`colors.js`** — Chalk-based ANSI color helpers and Unicode icons shared across all commands.
+
+## CI/CD
+
+GitHub Actions workflow (`.github/workflows/publish.yml`) publishes to npm automatically on push to `main`. Requires an `NPM_TOKEN` secret configured in the repository.
+
 ## Dependencies
 
 - **commander** — CLI framework

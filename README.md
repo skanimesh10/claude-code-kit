@@ -75,6 +75,8 @@ Compares the lockfile against on-disk skills and reports per-skill status plus p
 | Skill | Source | Description |
 |-------|--------|-------------|
 | `mcp-builder` | [anthropics/skills](https://github.com/anthropics/skills) | Guide for creating MCP (Model Context Protocol) servers that enable LLMs to interact with external services |
+| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | Frontend design patterns and best practices |
+| `react-best-practices` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | React development best practices and conventions |
 
 ## How it works
 
@@ -101,8 +103,12 @@ claude-code-kit/
 │       ├── lockfile.js        — Read/write skills-lock.json
 │       ├── skills.js          — Hash skill directories for change detection
 │       └── targets.js         — IDE target registry, transforms, and symlinks
+├── .github/
+│   └── workflows/
+│       └── publish.yml        — CI/CD: publish to npm on push to main
 ├── skills.json                — Bundled skill source registry
 ├── package.json
+├── RELEASE_NOTES.md
 ├── CLAUDE.md
 └── README.md
 ```
