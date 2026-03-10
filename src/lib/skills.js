@@ -1,9 +1,20 @@
+/**
+ * Skills hashing module -- computes deterministic SHA-256 hashes over skill
+ * directory contents for change detection. Hashes include relative file paths
+ * (sorted alphabetically) and file contents for stability across platforms.
+ */
+
 import { createHash } from "crypto";
-import { readdirSync, readFileSync, statSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 
 /**
  * Compute a deterministic SHA-256 hash over all files in a skill directory.
+ * Files are sorted alphabetically, and both relative paths and file contents
+ * are fed into the hash for stability.
+ *
+ * @param {string} skillDir - Path to the skill directory to hash
+ * @returns {string} Hex-encoded SHA-256 hash
  */
 export function computeHash(skillDir) {
   const hash = createHash("sha256");

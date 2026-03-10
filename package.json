@@ -1,6 +1,6 @@
 {
   "name": "@skanimesh10/claude-code-kit",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Bootstrap AI coding skills across IDEs (Claude, Cursor, VS Code, Antigravity)",
   "author": "Animesh Swain",
   "type": "module",

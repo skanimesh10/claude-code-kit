@@ -1,3 +1,9 @@
+/**
+ * Lockfile module -- reads and writes skills-lock.json in the user's project
+ * root. The lockfile tracks installed skills with their source repo, content
+ * hash, and selected IDE targets for change detection across updates.
+ */
+
 import { readFileSync, writeFileSync } from "fs";
 import { LOCKFILE } from "./config.js";
 

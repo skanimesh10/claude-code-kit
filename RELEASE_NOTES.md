@@ -1,6 +1,35 @@
 # Release Notes
 
-## v0.2.0 — Multi-IDE Target Support & Enhanced CLI
+## v0.3.0 -- Universal .agents/skills/ Directory
+
+### Breaking Changes
+
+- **Canonical directory changed** from `.localagent/skills/` to `.agents/skills/`. Existing installations should re-run `cc-kit init --force`.
+- **Removed per-IDE transforms** -- Cursor `.mdc`, VS Code `.instructions.md`, and Antigravity copy transforms are no longer generated. All IDEs now discover skills via `SKILL.md` in `.agents/skills/`.
+
+### New Features
+
+- **Universal skill discovery** -- Skills in `.agents/skills/` are automatically available to Amp, Antigravity, Cline, Codex, Cursor, Gemini CLI, GitHub Copilot, Kimi Code CLI, OpenCode, and Replit. Only Claude Code needs symlinks.
+- **SKILL.md generation** -- `cc-kit` now ensures every skill has a valid `SKILL.md` with `name` and `description` frontmatter, making them discoverable by `npx skills list`.
+- **YAML frontmatter escaping** -- Description values are properly escaped for safe YAML output.
+
+### Improvements
+
+- **DRY constants** -- Eliminated duplicate `LOCALAGENT_DIR` export; all path constants now live in `config.js` only.
+- **No emoji in output** -- All CLI indicators use text-based labels (`[OK]`, `[WARN]`, `[INFO]`, etc.).
+- **Comprehensive comments** -- JSDoc and inline comments added to all exported functions and non-trivial logic.
+- **Simplified target system** -- Target registry reduced to only Claude Code; no transforms needed.
+
+### Internal Changes
+
+- Removed `transformSkill()`, cursor/vscode/antigravity transform logic from `targets.js`.
+- Added `ensureSkillMd()` and `escapeFrontmatter()` to `targets.js`.
+- Removed `LOCALAGENT_DIR` and `CANONICAL_SKILLS_DIR` from `targets.js` (use `config.js` imports).
+- Simplified `createSymlink()` and `processTarget()` -- all symlinks are dir symlinks to `.agents/skills/`.
+
+---
+
+## v0.2.0 -- Multi-IDE Target Support & Enhanced CLI
 
 ### New Features
 
