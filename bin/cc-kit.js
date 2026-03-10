@@ -13,7 +13,7 @@ import { status } from "../src/commands/status.js";
 program
   .name("cc-kit")
   .description("CLI tool to install and manage AI coding skills across IDEs")
-  .version("0.2.0", "-v, --version", "Display version number");
+  .version("0.3.0", "-v, --version", "Display version number");
 
 program
   .command("init")

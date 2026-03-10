@@ -1,7 +1,7 @@
 /**
- * `cc-kit status` command — checks skill installation status across all
- * saved targets. Reports hash-based status for canonical skills and
- * symlink status for IDE targets.
+ * `cc-kit status` command -- checks skill installation status by comparing
+ * lockfile hashes against on-disk content, and validates symlink health
+ * for saved targets (e.g. Claude Code).
  */
 
 import { existsSync, readdirSync, lstatSync, readlinkSync } from "fs";
@@ -10,17 +10,21 @@ import ora from "ora";
 import { SKILLS_DIR } from "../lib/config.js";
 import { readLockfile } from "../lib/lockfile.js";
 import { computeHash } from "../lib/skills.js";
-import { TARGETS, LOCALAGENT_DIR, CANONICAL_SKILLS_DIR } from "../lib/targets.js";
+import { TARGETS } from "../lib/targets.js";
 import { bold, dim, cyan, green, red, yellow, icons } from "../lib/colors.js";
 
-export function status(options) {
+/**
+ * Run the status command. Reports per-skill status (OK, MISSING, UNTRACKED,
+ * MODIFIED) and per-target symlink health.
+ */
+export function status() {
   const spinner = ora("Checking skills status...").start();
 
   const lock = readLockfile();
   const lockedNames = new Set(Object.keys(lock.skills));
   const targetKeys = lock.targets || ["claude"];
 
-  // Get on-disk skill directories from canonical location
+  // Collect skill directories from the canonical .agents/skills/ location
   let diskNames = [];
   if (existsSync(SKILLS_DIR)) {
     diskNames = readdirSync(SKILLS_DIR, { withFileTypes: true })
@@ -29,17 +33,20 @@ export function status(options) {
   }
   const diskSet = new Set(diskNames);
 
+  // Merge lockfile and disk entries for a complete picture
   const allNames = [...new Set([...lockedNames, ...diskSet])].sort();
 
   if (allNames.length === 0) {
     spinner.stop();
-    console.log(`${icons.warn} ${yellow("No skills installed.")} Run ${cyan("cc-kit init")} to get started.`);
+    console.log(
+      `${icons.warn} ${yellow("No skills installed.")} Run ${cyan("cc-kit init")} to get started.`
+    );
     return;
   }
 
   spinner.stop();
 
-  // Canonical skills status
+  // -- Canonical skills status --
   console.log(bold("\nSkills status:\n"));
   for (const name of allNames) {
     const inLock = lockedNames.has(name);
@@ -50,6 +57,7 @@ export function status(options) {
     } else if (!inLock && onDisk) {
       console.log(`  ${name}  ${yellow("UNTRACKED")}`);
     } else {
+      // Both in lockfile and on disk -- compare hashes
       const hash = computeHash(join(SKILLS_DIR, name));
       if (hash !== lock.skills[name].computedHash) {
         console.log(`  ${name}  ${yellow("MODIFIED")}`);
@@ -59,7 +67,7 @@ export function status(options) {
     }
   }
 
-  // Per-target symlink status
+  // -- Per-target symlink status --
   console.log(bold("\nTargets:\n"));
   for (const targetKey of targetKeys) {
     const target = TARGETS[targetKey];
@@ -69,18 +77,9 @@ export function status(options) {
     for (const name of allNames) {
       if (!lockedNames.has(name)) continue;
 
-      let linkPath, expectedSource;
-      if (targetKey === "claude") {
-        linkPath = join(target.ideDir, name);
-        expectedSource = join(CANONICAL_SKILLS_DIR, name);
-      } else if (target.symlinkType === "file") {
-        const fileName = `${name}${target.ext}`;
-        linkPath = join(target.ideDir, fileName);
-        expectedSource = join(LOCALAGENT_DIR, target.localDir, fileName);
-      } else {
-        linkPath = join(target.ideDir, name);
-        expectedSource = join(LOCALAGENT_DIR, target.localDir, name);
-      }
+      // All targets use dir symlinks pointing to .agents/skills/<name>
+      const linkPath = join(target.ideDir, name);
+      const expectedSource = join(SKILLS_DIR, name);
 
       if (!existsSync(linkPath)) {
         issues.push(`    ${name}  ${red("MISSING SYMLINK")}`);
@@ -99,15 +98,22 @@ export function status(options) {
     }
   }
 
-  console.log(dim(`\n${allNames.length} skills, ${targetKeys.length} target(s).`));
+  console.log(dim(`\n${allNames.length} skill(s), ${targetKeys.length} target(s).`));
 }
 
+/**
+ * Check if a path is a valid symlink pointing to the expected relative target.
+ * @param {string} linkPath - Path where the symlink should be
+ * @param {string} expectedSource - Path the symlink should resolve to
+ * @returns {boolean}
+ */
 function isValidSymlink(linkPath, expectedSource) {
   try {
     const stat = lstatSync(linkPath);
     if (!stat.isSymbolicLink()) return false;
+
+    // Compare the symlink's actual target with the expected relative path
     const linkTarget = readlinkSync(linkPath);
-    // Check if it resolves to the expected relative path
     const expectedRel = relative(join(linkPath, ".."), expectedSource);
     return linkTarget === expectedRel;
   } catch {
